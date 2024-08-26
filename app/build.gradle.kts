@@ -95,6 +95,10 @@ dependencies {
     implementation(libs.androidx.material)
 
     implementation(libs.coil.compose)
+
+    // Scalars Convertor
+    implementation (libs.converter.scalars)
+
     // Moshi
     implementation(libs.moshi)
     implementation(libs.moshi.kotlin)
@@ -110,4 +114,6 @@ dependencies {
     implementation (libs.androidx.room.runtime)
     kapt (libs.androidx.room.compiler)
     implementation (libs.androidx.room.ktx)
+
+
 }
