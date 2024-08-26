@@ -1,12 +1,11 @@
 package com.falcon.assignmentnewsapp.viewmodels
 
 import android.content.Context
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.falcon.assignmentnewsapp.Resource
+import com.falcon.assignmentnewsapp.Utils.API_KEY
 import com.falcon.assignmentnewsapp.di.NewsRepository
 import com.falcon.assignmentnewsapp.modeels.Article
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,15 +24,13 @@ class NewsViewModel @Inject constructor(
     val articles: StateFlow<Resource<List<Article>>> get() = _articles
 
     init {
-        fetchNews()
-//        displayNews()
+        fetchNewsAndDisplay()
     }
 
-    private fun fetchNews() {
+    private fun fetchNewsAndDisplay() {
         viewModelScope.launch {
-
             try {
-                repository.fetchTopHeadlines("in", "cd5d106340b64feea1eb5e0eeaa8e700")
+                repository.fetchTopHeadlines("in", API_KEY)
             } catch (e: Exception) {
                 Log.e("NewsViewModel", "Error fetching news", e)
             }
@@ -47,31 +44,4 @@ class NewsViewModel @Inject constructor(
         }
 
     }
-
-//    private fun displayNews() {
-//
-//        viewModelScope.launch {
-//            try {
-//                val result = repository.getNewsFromDB()
-//                _articles.value = Resource.Success(result)
-//            } catch (e: Exception) {
-//                Log.e("NewsViewModel", "Error fetching news", e)
-//            }
-//        }
-//    }
-
-    fun getDataFromUrl(url: String, onResult: (String) -> Unit) {
-        viewModelScope.launch {
-            repository.fetchWebPageContent(url, onResult)
-        }
-    }
-}
-
-fun isNetworkAvailable(context: Context): Boolean {
-    val connectivityManager =
-        context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-    val network = connectivityManager.activeNetwork ?: return false
-    val networkCapabilities =
-        connectivityManager.getNetworkCapabilities(network) ?: return false
-    return networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
 }

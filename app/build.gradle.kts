@@ -96,24 +96,20 @@ dependencies {
 
     implementation(libs.coil.compose)
 
-    // Scalars Convertor
-    implementation (libs.converter.scalars)
-
     // Moshi
     implementation(libs.moshi)
     implementation(libs.moshi.kotlin)
     implementation(libs.moshi.adapters)
     implementation(libs.moshi.converter)
 
-    // Web view
-    implementation (libs.accompanist.webview)
     // Billing
     implementation (libs.billing)
+
+    // Lottie
+    implementation(libs.lottie.compose)
 
     // Room for Database
     implementation (libs.androidx.room.runtime)
     ksp (libs.androidx.room.compiler)
     implementation (libs.androidx.room.ktx)
-    implementation (libs.htmlparser)
-
 }

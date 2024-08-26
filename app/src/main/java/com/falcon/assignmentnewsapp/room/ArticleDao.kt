@@ -13,11 +13,6 @@ interface ArticleDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(articles: List<Article>)
 
-    @Query("SELECT * FROM article WHERE id = :id".toString())
-    suspend fun insertCats(catCount: Int): Int {
-        return catCount
-    }
-
     @Query("SELECT * FROM article".toString())
     suspend fun getAllArticles(): List<Article>
 }

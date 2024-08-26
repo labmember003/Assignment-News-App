@@ -1,6 +1,7 @@
 package com.falcon.assignmentnewsapp.screens
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -25,14 +26,11 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -46,6 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
@@ -57,6 +56,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.falcon.assignmentnewsapp.R
 import com.falcon.assignmentnewsapp.Resource
+import com.falcon.assignmentnewsapp.Utils
 import com.falcon.assignmentnewsapp.modeels.Article
 import com.falcon.assignmentnewsapp.viewmodels.NewsViewModel
 import com.google.accompanist.placeholder.PlaceholderHighlight
@@ -75,17 +75,15 @@ fun NewsListScreen(
 ) {
     val newsViewModel: NewsViewModel = hiltViewModel()
     val articles by newsViewModel.articles.collectAsState()
-    val snackbarHostState = remember { SnackbarHostState() }
-    fun getContent(url: String) {
-        newsViewModel.getDataFromUrl(url) { content ->
-            Log.i("kaali billi", content)
-            changeCurrentNewsContent(content)
-        }
+    val context = LocalContext.current
+    val sharedPreferences = remember {
+        context.getSharedPreferences("token_prefs", Context.MODE_PRIVATE)
     }
+    val editor = sharedPreferences.edit()
+    editor.putBoolean(Utils.NEWUSER, false)
+    editor.apply()
     Scaffold(
-        snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
-        }
+
     ) { _ ->
         Column {
             MainScreenHeader(navController)
@@ -106,16 +104,9 @@ fun NewsListScreen(
                     .padding(8.dp)
             )
 
-//            val pullRefreshState = rememberPullRefreshState(
-//                refreshing = articles is Resource.Loading,
-//                onRefresh = {
-//                    newsViewModel.fetchNews()
-//                }
-//            ) // TODO: USELESSSSSSSSSS NOT BORKING
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-//                    .pullRefresh(pullRefreshState) // TODO: Removed Refresh feature because it's crashing
             ) {
 
                 Log.i("NewsListScreen", "Before Entering When Statement, Class Name:" + articles.javaClass.simpleName)
@@ -137,12 +128,11 @@ fun NewsListScreen(
                                     NoticeItem(
                                         article = articleItem,
                                         modalSheetState = modalSheetState,
-                                        getContent = ::getContent
+                                        changeCurrentNewsContent = changeCurrentNewsContent
                                     )
                                 }
                             }
                         } else {
-                            // Handle case where no articles are available
                             Text(
                                 text = "No articles available.",
                                 modifier = Modifier.fillMaxSize().padding(16.dp)
@@ -158,11 +148,6 @@ fun NewsListScreen(
                         )
                     }
                 }
-//                PullRefreshIndicator(
-//                    refreshing = articles is Resource.Loading,
-//                    state = pullRefreshState,
-//                    modifier = Modifier.align(Alignment.TopCenter)
-//                ) // todo: yeh kyu nhi chl rrha, imposible glitch hai yeh toh
             }
         }
     }
@@ -175,7 +160,7 @@ fun NewsListScreen(
 fun NoticeItem(
     article: Article,
     modalSheetState: ModalBottomSheetState,
-    getContent: (String) -> Unit,
+    changeCurrentNewsContent: (String) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     Box(
@@ -189,7 +174,7 @@ fun NoticeItem(
                     .padding(8.dp, 8.dp, 8.dp, 2.dp)
                     .clickable {
                         scope.launch {
-                            getContent(article.url.toString())
+                            changeCurrentNewsContent(article.author.toString())
                             modalSheetState.show()
                         }
                     },
@@ -248,7 +233,6 @@ private fun MainScreenHeader(
                 .size(26.dp)
                 .clickable {
                     navController.navigate("settings")
-//                    TODO: HANDLE SETTINGS
                 }
         )
     }

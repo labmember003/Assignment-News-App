@@ -1,13 +1,10 @@
 [versions]
 accompanistPlaceholderMaterial = "0.24.3-alpha"
 accompanistSwiperefresh = "0.35.1-alpha"
-accompanistWebview = "0.28.0"
 agp = "8.5.2"
 billing = "7.0.0"
 coilCompose = "2.7.0"
-converterScalars = "2.9.0"
 foundation = "1.6.8"
-htmlparser = "2.1"
 kotlin = "2.0.0"
 coreKtx = "1.13.1"
 junit = "4.13.2"
@@ -26,7 +23,6 @@ material = "1.6.8"
 materialIconsExtended = "1.7.0-rc01"
 navigationCompose = "2.8.0-rc01"
 okhttp = "5.0.0-alpha.14"
-playServicesOssLicenses = "17.1.0"
 retrofit = "2.11.0"
 roomRuntime = "2.6.1"
 serialization = "1.6.3"
@@ -36,7 +32,6 @@ moshiKotlin = "1.14.0"
 [libraries]
 accompanist-placeholder-material = { module = "com.google.accompanist:accompanist-placeholder-material", version.ref = "accompanistPlaceholderMaterial" }
 accompanist-swiperefresh = { module = "com.google.accompanist:accompanist-swiperefresh", version.ref = "accompanistSwiperefresh" }
-accompanist-webview = { module = "com.google.accompanist:accompanist-webview", version.ref = "accompanistWebview" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "foundation" }
 androidx-material = { module = "androidx.compose.material:material", version.ref = "material" }
@@ -45,8 +40,6 @@ androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomRunt
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
 billing = { module = "com.android.billingclient:billing", version.ref = "billing" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
-converter-scalars = { module = "com.squareup.retrofit2:converter-scalars", version.ref = "converterScalars" }
-htmlparser = { module = "org.htmlparser:htmlparser", version.ref = "htmlparser" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -70,7 +63,6 @@ androidx-material-icons-extended = { module = "androidx.compose.material:materia
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "loggingInterceptor" }
-play-services-oss-licenses = { module = "com.google.android.gms:play-services-oss-licenses", version.ref = "playServicesOssLicenses" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization"}
 

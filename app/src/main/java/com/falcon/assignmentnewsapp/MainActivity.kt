@@ -1,5 +1,6 @@
 package com.falcon.assignmentnewsapp
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
@@ -32,6 +33,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -41,6 +43,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.falcon.assignmentnewsapp.screens.NewsListScreen
+import com.falcon.assignmentnewsapp.screens.WelcomePag
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -63,7 +66,21 @@ class MainActivity : ComponentActivity() {
             fun changeCurrentNewsContent(contentOfCurrentNews: String) {
                 currentNewsContent = contentOfCurrentNews
             }
-            NavHost(navController = navController, startDestination = "main_screen") {
+            val context = LocalContext.current
+            val sharedPreferences = remember {
+                context.getSharedPreferences("token_prefs", Context.MODE_PRIVATE)
+            }
+            val isNewUser = sharedPreferences.getBoolean(Utils.NEWUSER, true)
+            val startDestination = if (isNewUser) "welcome_page" else "main_screen"
+            NavHost(navController = navController, startDestination = startDestination) {
+                composable("welcome_page") {
+                    BackHandler(
+                        onBack = {
+                            finish()
+                        }
+                    )
+                    WelcomePag(navController)
+                }
                 composable("main_screen") {
                     BackHandler(
                         onBack = {
@@ -133,7 +150,7 @@ fun MainScreenBottomSheetContent(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Menu",
+                text = "Author",
                 style = androidx.compose.material.MaterialTheme.typography.subtitle1,
                 fontSize = 20.sp
             )
