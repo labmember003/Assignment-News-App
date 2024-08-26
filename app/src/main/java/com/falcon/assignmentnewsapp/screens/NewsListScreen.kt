@@ -36,7 +36,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -75,18 +74,17 @@ fun NewsListScreen(
     modalSheetState: ModalBottomSheetState,
     navController: NavHostController,
     changeCurrentNewsContent: (String) -> Unit,
+
 ) {
     val newsViewModel: NewsViewModel = hiltViewModel()
     val articles by newsViewModel.articles.collectAsState()
-    val context = LocalContext.current
-    val sharedPreferences = remember {
-        context.getSharedPreferences("token_prefs", Context.MODE_PRIVATE)
-    }
-    val editor = sharedPreferences.edit()
-    editor.putBoolean(Utils.NEWUSER, false)
-    editor.apply()
     val snackbarHostState = remember { SnackbarHostState() }
-
+    fun getContent(url: String) {
+        newsViewModel.getDataFromUrl(url) { content ->
+            Log.i("kaali billi", content)
+            changeCurrentNewsContent(content)
+        }
+    }
     Scaffold(
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
@@ -116,12 +114,6 @@ fun NewsListScreen(
                     newsViewModel.fetchNews()
                 }
             ) // TODO: USELESSSSSSSSSS NOT BORKING
-            fun getContent(url: String) {
-                newsViewModel.getDataFromUrl(url) { content ->
-                    Log.i("kaali billi", content)
-                    changeCurrentNewsContent(content)
-                }
-            }
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -130,10 +122,13 @@ fun NewsListScreen(
                 Log.i("NewsListScreen", "Before Entering When Statement, Class Name:" + articles.javaClass.simpleName)
                 when (articles) {
                     is Resource.Loading -> {
+                        Log.i("NewsListScreen", "Loading State")
                         ShimmerEffect()
                     }
                     is Resource.Success -> {
+                        Log.i("NewsListScreen", "Success State with ${(articles as Resource.Success<List<Article>>).data.size} articles")
                         Log.i("NewsListScreen", "Inside Resource.Success Block, Class Name:" + articles.javaClass.simpleName)
+
                         LazyColumn(modifier = Modifier.fillMaxSize()) {
                             val filteredNews = (articles as Resource.Success<List<Article>>).data.filter {
                                 it.title?.contains(searchQuery, true) ?: false
@@ -148,6 +143,7 @@ fun NewsListScreen(
                         }
                     }
                     is Resource.Error -> {
+                        Log.e("NewsListScreen", "Error: ${(articles as Resource.Error).message}")
                         Text(
                             text = (articles as Resource.Error).message,
                             color = Color.Red,
@@ -163,6 +159,7 @@ fun NewsListScreen(
             }
         }
     }
+
 }
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -184,8 +181,8 @@ fun NoticeItem(
                     .background(color = colorResource(id = R.color.white))
                     .padding(8.dp, 8.dp, 8.dp, 2.dp)
                     .clickable {
-                        getContent(article.url.toString())
                         scope.launch {
+                            getContent(article.url.toString())
                             modalSheetState.show()
                         }
                     },

@@ -35,6 +35,7 @@ class NewsViewModel @Inject constructor(
                 Log.e("NewsViewModel", "Error fetching news", e)
             }
         }
+
     }
 
     private fun displayNews() {

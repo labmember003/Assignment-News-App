@@ -5,13 +5,16 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetState
@@ -55,7 +58,7 @@ class MainActivity : ComponentActivity() {
                 skipHalfExpanded = true
             )
             var currentNewsContent by remember {
-                mutableStateOf("This is your own news, enjoy your news, todays news is i am supreme leader")
+                mutableStateOf("Loading Please Wait......")
             }
             fun changeCurrentNewsContent(contentOfCurrentNews: String) {
                 currentNewsContent = contentOfCurrentNews
@@ -119,6 +122,7 @@ fun MainScreenBottomSheetContent(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
+            .verticalScroll(rememberScrollState())
     ) {
         Row(
             modifier = Modifier
