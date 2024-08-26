@@ -2,6 +2,8 @@ package com.falcon.assignmentnewsapp.screens
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -26,6 +28,8 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -71,7 +75,6 @@ fun NewsListScreen(
     modalSheetState: ModalBottomSheetState,
     navController: NavHostController,
     changeCurrentNewsContent: (String) -> Unit,
-
 ) {
     val newsViewModel: NewsViewModel = hiltViewModel()
     val articles by newsViewModel.articles.collectAsState()
@@ -79,73 +82,77 @@ fun NewsListScreen(
     val sharedPreferences = remember {
         context.getSharedPreferences("token_prefs", Context.MODE_PRIVATE)
     }
-    val editor = sharedPreferences.edit()
-    editor.putBoolean(Utils.NEWUSER, false)
-    editor.apply()
-    Scaffold(
+    val isNewUser = sharedPreferences.getBoolean(Utils.NEWUSER, false)
+    if (isNewUser && !isNetworkAvailable(context)) {
+        ErrorPage()
+    } else {
+        val editor = sharedPreferences.edit()
+        editor.putBoolean(Utils.NEWUSER, false)
+        editor.apply()
 
-    ) { _ ->
-        Column {
-            MainScreenHeader(navController)
-            var searchQuery by remember { mutableStateOf("") }
-            OutlinedTextField(
-                value = searchQuery,
-                onValueChange = { searchQuery = it },
-                label = { Text("Search") },
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color.Black,
-                    unfocusedBorderColor = Color.Black,
-                    focusedLabelColor = Color.Black,
-                    cursorColor = Color.Black
-                ),
-                shape = RoundedCornerShape(10.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
-            )
+        Scaffold() { _ ->
+            Column {
+                MainScreenHeader(navController)
+                var searchQuery by remember { mutableStateOf("") }
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = { searchQuery = it },
+                    label = { Text("Search") },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color.Black,
+                        unfocusedBorderColor = Color.Black,
+                        focusedLabelColor = Color.Black,
+                        cursorColor = Color.Black
+                    ),
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                )
 
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
 
-                Log.i("NewsListScreen", "Before Entering When Statement, Class Name:" + articles.javaClass.simpleName)
-                when (articles) {
-                    is Resource.Loading -> {
-                        Log.i("NewsListScreen", "Loading State")
-                        ShimmerEffect()
-                    }
-                    is Resource.Success -> {
-                        Log.i("NewsListScreen", "Success State with ${(articles as Resource.Success<List<Article>>).data.size} articles")
-                        Log.i("NewsListScreen", "Inside Resource.Success Block, Class Name:" + articles.javaClass.simpleName)
-                        val data = (articles as Resource.Success<List<Article>>).data
-                        if (data.isNotEmpty()) {
-                            LazyColumn(modifier = Modifier.fillMaxSize()) {
-                                val filteredNews = (articles as Resource.Success<List<Article>>).data.filter {
-                                    it.title?.contains(searchQuery, true) ?: false
+                    Log.i("NewsListScreen", "Before Entering When Statement, Class Name:" + articles.javaClass.simpleName)
+                    when (articles) {
+                        is Resource.Loading -> {
+                            Log.i("NewsListScreen", "Loading State")
+                            ShimmerEffect()
+                        }
+                        is Resource.Success -> {
+                            Log.i("NewsListScreen", "Success State with ${(articles as Resource.Success<List<Article>>).data.size} articles")
+                            Log.i("NewsListScreen", "Inside Resource.Success Block, Class Name:" + articles.javaClass.simpleName)
+                            val data = (articles as Resource.Success<List<Article>>).data
+                            if (data.isNotEmpty()) {
+                                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                                    val filteredNews = (articles as Resource.Success<List<Article>>).data.filter {
+                                        it.title?.contains(searchQuery, true) ?: false
+                                    }
+                                    items(filteredNews) { articleItem ->
+                                        NoticeItem(
+                                            article = articleItem,
+                                            modalSheetState = modalSheetState,
+                                            changeCurrentNewsContent = changeCurrentNewsContent
+                                        )
+                                    }
                                 }
-                                items(filteredNews) { articleItem ->
-                                    NoticeItem(
-                                        article = articleItem,
-                                        modalSheetState = modalSheetState,
-                                        changeCurrentNewsContent = changeCurrentNewsContent
-                                    )
-                                }
+                            } else {
+                                Text(
+                                    text = "No articles available.",
+                                    modifier = Modifier.fillMaxSize().padding(16.dp)
+                                )
                             }
-                        } else {
+                        }
+                        is Resource.Error -> {
+                            Log.e("NewsListScreen", "Error: ${(articles as Resource.Error).message}")
                             Text(
-                                text = "No articles available.",
-                                modifier = Modifier.fillMaxSize().padding(16.dp)
+                                text = (articles as Resource.Error).message,
+                                color = Color.Red,
+                                modifier = Modifier.padding(16.dp)
                             )
                         }
-                    }
-                    is Resource.Error -> {
-                        Log.e("NewsListScreen", "Error: ${(articles as Resource.Error).message}")
-                        Text(
-                            text = (articles as Resource.Error).message,
-                            color = Color.Red,
-                            modifier = Modifier.padding(16.dp)
-                        )
                     }
                 }
             }
@@ -253,6 +260,48 @@ fun ShimmerEffect() {
                         color = Color.LightGray
                     )
             ) {}
+        }
+    }
+}
+
+private fun isNetworkAvailable(context: Context): Boolean {
+    val connectivityManager =
+        context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    val network = connectivityManager.activeNetwork ?: return false
+    val networkCapabilities =
+        connectivityManager.getNetworkCapabilities(network) ?: return false
+    return networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+}
+
+@Composable
+fun ErrorPage(
+
+) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        LottieAnimation(animationID = R.raw.error_cat)
+        Text(
+            text = "Network Unavailable....."
+        )
+        Spacer(
+            modifier = Modifier
+                .size(20.dp)
+        )
+        Button(
+            onClick = {
+
+            },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Black,
+                contentColor = Color.White
+            ),
+        ) {
+            Text(
+                text = "RETRY",
+            )
         }
     }
 }
