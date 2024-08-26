@@ -33,8 +33,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.falcon.assignmentnewsapp.screens.NewsListScreen
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterialApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,7 +55,7 @@ class MainActivity : ComponentActivity() {
             fun changeCurrentNewsContent(contentOfCurrentNews: String) {
                 currentNewsContent = contentOfCurrentNews
             }
-            NavHost(navController = navController, startDestination = "main_page") {
+            NavHost(navController = navController, startDestination = "main_screen") {
                 composable("main_screen") {
                     BackHandler(
                         onBack = {

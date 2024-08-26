@@ -3,9 +3,9 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.hilt.android)
-    id ("kotlin-kapt")
     id("kotlin-parcelize")
     alias(libs.plugins.kotlin.serialization)
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -80,7 +80,7 @@ dependencies {
     // Serialization
     implementation(libs.kotlinx.serialization.json)
     // Hilt
-    kapt(libs.hilt.android.compiler)
+    ksp(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.hilt.android)
 
@@ -112,7 +112,7 @@ dependencies {
 
     // Room for Database
     implementation (libs.androidx.room.runtime)
-    kapt (libs.androidx.room.compiler)
+    ksp (libs.androidx.room.compiler)
     implementation (libs.androidx.room.ktx)
 
 

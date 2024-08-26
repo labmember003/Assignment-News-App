@@ -226,7 +226,7 @@ private fun MainScreenHeader(
             .padding(12.dp, 24.dp, 8.dp, 0.dp)
     ) {
         Text(
-            text = "GGSIPU NOTICES",
+            text = "ASSIGNMENT NEWS",
             fontSize = 24.sp,
             fontFamily = FontFamily(Font(R.font.nunito_bold_1)),
             style = MaterialTheme.typography.bodyLarge.copy(

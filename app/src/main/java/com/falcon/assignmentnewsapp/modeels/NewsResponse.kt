@@ -1,5 +1,7 @@
 package com.falcon.assignmentnewsapp.modeels
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
 data class NewsResponse(
@@ -11,7 +13,9 @@ data class NewsResponse(
     val articles: List<Article>? = null
 )
 
+@Entity(tableName = "article")
 data class Article(
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
     @SerializedName("source") val source: String? = null,
     @SerializedName("author") val author: String? = null,
     @SerializedName("title") val title: String? = null,

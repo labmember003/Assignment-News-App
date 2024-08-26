@@ -37,21 +37,4 @@ abstract class NewsDatabase : RoomDatabase() {
     abstract fun articleDao(): ArticleDao
 }
 
-@Module
-@InstallIn(SingletonComponent::class)
-object DatabaseModule {
-    @Provides
-    @Singleton
-    fun provideDatabase(@ApplicationContext appContext: Context): NewsDatabase {
-        return Room.databaseBuilder(
-            appContext,
-            NewsDatabase::class.java,
-            "news_database"
-        ).build()
-    }
 
-    @Provides
-    fun provideArticleDao(database: NewsDatabase): ArticleDao {
-        return database.articleDao()
-    }
-}
