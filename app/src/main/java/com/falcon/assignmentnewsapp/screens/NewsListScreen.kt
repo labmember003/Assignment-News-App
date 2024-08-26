@@ -116,7 +116,12 @@ fun NewsListScreen(
                     newsViewModel.fetchNews()
                 }
             ) // TODO: USELESSSSSSSSSS NOT BORKING
-
+            fun getContent(url: String) {
+                newsViewModel.getDataFromUrl(url) { content ->
+                    Log.i("kaali billi", content)
+                    changeCurrentNewsContent(content)
+                }
+            }
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -134,15 +139,10 @@ fun NewsListScreen(
                                 it.title?.contains(searchQuery, true) ?: false
                             }
                             items(filteredNews) { articleItem ->
-                                LaunchedEffect(articleItem.url) {
-                                    newsViewModel.getDataFromUrl(articleItem.url.toString()) { content ->
-                                        Log.i("kaali billi", content)
-                                        changeCurrentNewsContent(content)
-                                    }
-                                }
                                 NoticeItem(
                                     article = articleItem,
-                                    modalSheetState = modalSheetState
+                                    modalSheetState = modalSheetState,
+                                    getContent = ::getContent
                                 )
                             }
                         }
@@ -171,6 +171,7 @@ fun NewsListScreen(
 fun NoticeItem(
     article: Article,
     modalSheetState: ModalBottomSheetState,
+    getContent: (String) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     Box(
@@ -183,6 +184,7 @@ fun NoticeItem(
                     .background(color = colorResource(id = R.color.white))
                     .padding(8.dp, 8.dp, 8.dp, 2.dp)
                     .clickable {
+                        getContent(article.url.toString())
                         scope.launch {
                             modalSheetState.show()
                         }

@@ -71,7 +71,7 @@ class MainActivity : ComponentActivity() {
                         sheetState = modalSheetState,
                         sheetShape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp),
                         sheetContent = {
-                            MainScreenBottomSheetContent(modalSheetState)
+                            MainScreenBottomSheetContent(modalSheetState, currentNewsContent)
                         }
                     , content = {
                         NewsListScreen(
@@ -111,6 +111,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainScreenBottomSheetContent(
     modalSheetState: ModalBottomSheetState,
+    currentNewsContent: String,
 ) {
     val scope = rememberCoroutineScope()
     Column(
@@ -141,6 +142,13 @@ fun MainScreenBottomSheetContent(
                     }
             )
         }
-        // TODO: ADD TEXT
+        androidx.compose.material.Text(
+            text = currentNewsContent,
+            fontSize = 16.sp,
+            fontFamily = FontFamily(Font(R.font.nunito_bold_1)),
+            style = MaterialTheme.typography.bodyLarge.copy(
+                fontWeight = FontWeight.SemiBold
+            )
+        )
     }
 }
