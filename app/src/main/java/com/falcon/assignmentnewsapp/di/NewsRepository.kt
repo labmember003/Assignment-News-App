@@ -1,17 +1,15 @@
 package com.falcon.assignmentnewsapp.di
 
 import android.util.Log
+import com.falcon.assignmentnewsapp.modeels.Article
 import com.falcon.assignmentnewsapp.network.DataFromContentService
 import com.falcon.assignmentnewsapp.network.NewsService
 import com.falcon.assignmentnewsapp.room.ArticleDao
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import javax.inject.Inject
 import javax.inject.Singleton
-import retrofit2.Callback
-import retrofit2.Call
-import retrofit2.Response
 
 @Singleton
 class NewsRepository @Inject constructor(
@@ -19,6 +17,10 @@ class NewsRepository @Inject constructor(
     private val articleDao: ArticleDao,
     private val dataFromContentService: DataFromContentService
 ) {
+    suspend fun getNewsFromDB(): List<Article> {
+        return articleDao.getAllArticles()
+    }
+
     suspend fun fetchTopHeadlines(country: String, apiKey: String) {
         val response = newsService.getTopHeadlines(country, apiKey)
         if (response.status == "ok") {
@@ -26,7 +28,7 @@ class NewsRepository @Inject constructor(
             Log.i("NewsRepository", "${response.articles?.size} in db storeed")
         }
     }
-    suspend fun fetchWebPageContent(url: String, onResult: (String) -> Unit) {
+    fun fetchWebPageContent(url: String, onResult: (String) -> Unit) {
         val webService = dataFromContentService
         val call = webService.getPageContent(url)
         call.enqueue(object : Callback<String> {

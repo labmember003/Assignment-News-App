@@ -24,12 +24,25 @@ class NewsViewModel @Inject constructor(
 
     init {
         fetchNews()
+        displayNews()
     }
 
     fun fetchNews() {
         viewModelScope.launch {
             try {
                 repository.fetchTopHeadlines("in", "cd5d106340b64feea1eb5e0eeaa8e700")
+            } catch (e: Exception) {
+                Log.e("NewsViewModel", "Error fetching news", e)
+            }
+        }
+    }
+
+    private fun displayNews() {
+        _articles.value = Resource.Loading
+        viewModelScope.launch {
+            try {
+                val result = repository.getNewsFromDB()
+                _articles.value = Resource.Success(result)
             } catch (e: Exception) {
                 Log.e("NewsViewModel", "Error fetching news", e)
             }

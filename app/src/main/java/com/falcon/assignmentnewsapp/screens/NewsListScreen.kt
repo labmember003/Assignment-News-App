@@ -136,6 +136,7 @@ fun NewsListScreen(
                             items(filteredNews) { articleItem ->
                                 LaunchedEffect(articleItem.url) {
                                     newsViewModel.getDataFromUrl(articleItem.url.toString()) { content ->
+                                        Log.i("kaali billi", content)
                                         changeCurrentNewsContent(content)
                                     }
                                 }

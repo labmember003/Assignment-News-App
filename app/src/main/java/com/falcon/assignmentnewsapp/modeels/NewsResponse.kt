@@ -16,7 +16,6 @@ data class NewsResponse(
 @Entity(tableName = "article")
 data class Article(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    @SerializedName("source") val source: String? = null,
     @SerializedName("author") val author: String? = null,
     @SerializedName("title") val title: String? = null,
     @SerializedName("description") val description: String? = null,
