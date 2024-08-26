@@ -1,7 +1,6 @@
 package com.falcon.assignmentnewsapp.screens
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -47,7 +46,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
@@ -59,7 +57,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.falcon.assignmentnewsapp.R
 import com.falcon.assignmentnewsapp.Resource
-import com.falcon.assignmentnewsapp.Utils
 import com.falcon.assignmentnewsapp.modeels.Article
 import com.falcon.assignmentnewsapp.viewmodels.NewsViewModel
 import com.google.accompanist.placeholder.PlaceholderHighlight
@@ -108,17 +105,19 @@ fun NewsListScreen(
                     .fillMaxWidth()
                     .padding(8.dp)
             )
-            val pullRefreshState = rememberPullRefreshState(
-                refreshing = articles is Resource.Loading,
-                onRefresh = {
-                    newsViewModel.fetchNews()
-                }
-            ) // TODO: USELESSSSSSSSSS NOT BORKING
+
+//            val pullRefreshState = rememberPullRefreshState(
+//                refreshing = articles is Resource.Loading,
+//                onRefresh = {
+//                    newsViewModel.fetchNews()
+//                }
+//            ) // TODO: USELESSSSSSSSSS NOT BORKING
             Box(
                 modifier = Modifier
                     .fillMaxSize()
 //                    .pullRefresh(pullRefreshState) // TODO: Removed Refresh feature because it's crashing
             ) {
+
                 Log.i("NewsListScreen", "Before Entering When Statement, Class Name:" + articles.javaClass.simpleName)
                 when (articles) {
                     is Resource.Loading -> {
@@ -128,18 +127,26 @@ fun NewsListScreen(
                     is Resource.Success -> {
                         Log.i("NewsListScreen", "Success State with ${(articles as Resource.Success<List<Article>>).data.size} articles")
                         Log.i("NewsListScreen", "Inside Resource.Success Block, Class Name:" + articles.javaClass.simpleName)
-
-                        LazyColumn(modifier = Modifier.fillMaxSize()) {
-                            val filteredNews = (articles as Resource.Success<List<Article>>).data.filter {
-                                it.title?.contains(searchQuery, true) ?: false
+                        val data = (articles as Resource.Success<List<Article>>).data
+                        if (data.isNotEmpty()) {
+                            LazyColumn(modifier = Modifier.fillMaxSize()) {
+                                val filteredNews = (articles as Resource.Success<List<Article>>).data.filter {
+                                    it.title?.contains(searchQuery, true) ?: false
+                                }
+                                items(filteredNews) { articleItem ->
+                                    NoticeItem(
+                                        article = articleItem,
+                                        modalSheetState = modalSheetState,
+                                        getContent = ::getContent
+                                    )
+                                }
                             }
-                            items(filteredNews) { articleItem ->
-                                NoticeItem(
-                                    article = articleItem,
-                                    modalSheetState = modalSheetState,
-                                    getContent = ::getContent
-                                )
-                            }
+                        } else {
+                            // Handle case where no articles are available
+                            Text(
+                                text = "No articles available.",
+                                modifier = Modifier.fillMaxSize().padding(16.dp)
+                            )
                         }
                     }
                     is Resource.Error -> {

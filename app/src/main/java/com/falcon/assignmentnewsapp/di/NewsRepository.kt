@@ -1,11 +1,11 @@
 package com.falcon.assignmentnewsapp.di
 
 import android.util.Log
+import androidx.core.text.parseAsHtml
 import com.falcon.assignmentnewsapp.modeels.Article
 import com.falcon.assignmentnewsapp.network.DataFromContentService
 import com.falcon.assignmentnewsapp.network.NewsService
 import com.falcon.assignmentnewsapp.room.ArticleDao
-import org.jsoup.Jsoup
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -36,7 +36,7 @@ class NewsRepository @Inject constructor(
         call.enqueue(object : Callback<String> {
             override fun onResponse(call: Call<String>, response: Response<String>) {
                 if (response.isSuccessful) {
-                    response.body()?.let { onResult(it) }
+                    response.body()?.let { onResult(it.parseAsHtml().toString()) }
 //                    response.body()?.let { htmlContent ->
 //                        val textContent = parseHtmlToText(htmlContent)
 //                        onResult(textContent)
@@ -50,16 +50,5 @@ class NewsRepository @Inject constructor(
                 Log.e("FetchContent", "Error fetching content", t)
             }
         })
-    }
-}
-fun parseHtmlToText(html: String): String {
-    return try {
-        // Use Jsoup to parse the HTML and extract text
-        val document = Jsoup.parse(html)
-        // Select the main content element - this will vary based on the site's HTML structure
-        document.select("article").text() // Adjust the selector based on the structure
-    } catch (e: IOException) {
-        e.printStackTrace()
-        "Error parsing HTML"
     }
 }
